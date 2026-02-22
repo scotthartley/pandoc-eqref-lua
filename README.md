@@ -116,7 +116,7 @@ The equation followed by non-breaking spaces and the equation number in parenthe
 - [Pandoc](https://pandoc.org/) 2.11 or later (Lua 5.4 filter support)
 - A LaTeX distribution (e.g. TeX Live or MiKTeX) for PDF output
 - `mhchem` LaTeX package for chemical equation PDF output
-- [`pandoc-chem-sub.lua`](https://github.com/hartlecs/pandoc-chem-sub-lua) for chemical equation rendering in HTML/docx
+- [`pandoc-chem-sub.lua`](https://github.com/scotthartley/pandoc-chem-sub-lua) for chemical equation rendering in HTML/docx
 
 ## Installation
 
