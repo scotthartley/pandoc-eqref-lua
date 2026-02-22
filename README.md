@@ -5,7 +5,7 @@ A Pandoc Lua filter that numbers display math equations and chemical equations, 
 ## Features
 
 - Tags display math blocks with `{#eq:id}` to assign a sequence number
-- Tags standalone chemical equation lines (`s:{formula} {#eq:id}`) in the same numbering sequence
+- Tags standalone chemical equation lines (`[formula]{.chem} {#eq:id}`) in the same numbering sequence
 - Replaces `@eq:id` citations with the corresponding number
 - Output adapts to the target format:
   - **LaTeX / PDF** — wraps math in an `equation` environment with `\label`; wraps chemical equations in `\begin{equation}\ce{...}\label{}\end{equation}`; uses `\ref` for citations
@@ -25,9 +25,9 @@ pandoc input.md --lua-filter pandoc-eqref.lua -o output.docx
 
 ### Math + chemical equations
 
-When using chemical equation syntax (`s:{...}`), this filter must run **before**
-`pandoc-chem-sub.lua` so it can detect the raw `s:{...}` notation before chem-sub
-converts it to Unicode inlines:
+When using chemical equation syntax (`[...]{.chem}`), this filter must run **before**
+`pandoc-chem-sub.lua` so it can detect the `.chem` span before chem-sub converts it
+to Unicode inlines:
 
 ```bash
 pandoc input.md --lua-filter pandoc-eqref.lua --lua-filter pandoc-chem-sub.lua -o output.html
@@ -54,7 +54,7 @@ See @eq:first and @eq:energy for details.
 Place the equation tag on the **same line** as the chemical formula, with no other text:
 
 ```markdown
-s:{CH3CH2OH + HBr -> CH3CH2Br + H2O} {#eq:rxn}
+[CH3CH2OH + HBr -> CH3CH2Br + H2O]{.chem} {#eq:rxn}
 
 $$E = mc^2$$ {#eq:energy}
 
@@ -65,7 +65,7 @@ Expected output: `eq:rxn` → (1), `eq:energy` → (2); references render as `1`
 
 The tag must follow the pattern `{#<id>}`. Any identifier works; the `eq:` prefix is a convention.
 
-**Note:** The chemical equation line must contain *only* `s:{...} {#id}` — no surrounding
+**Note:** The chemical equation line must contain *only* `[formula]{.chem} {#id}` — no surrounding
 prose. This prevents accidentally numbering inline chemical formulas.
 
 ## Output examples
@@ -97,7 +97,7 @@ document metadata or a custom header:
 
 Each equation is rendered in a three-column CSS grid so the number floats to the right
 margin while the equation stays centred. For chemical equations, `pandoc-chem-sub.lua`
-then converts the `s:{...}` notation inside the grid to properly formatted Unicode:
+then converts the `.chem` span inside the grid to properly formatted Unicode:
 
 ```html
 <div style="display:grid;grid-template-columns:1fr auto 1fr;align-items:center;">
