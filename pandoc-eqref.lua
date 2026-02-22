@@ -13,6 +13,8 @@
 
 -- Ordered list of equation identifiers, used to map IDs to sequence numbers.
 local ids = {}
+-- Reverse map: id_tag -> sequence number, for O(1) reference lookup.
+local id_to_num = {}
 
 -- Find the matching closing brace for the open brace at open_pos in string s.
 -- Returns the position of the closing brace, or nil if unmatched.
@@ -38,17 +40,12 @@ end
 -- the s:{...} starts at the beginning (no non-whitespace before it),
 -- and a {#id} label immediately follows with no other non-whitespace text.
 local function detect_chem_equation(inlines)
-    -- Only process Paras made entirely of Str/Space/SoftBreak
-    for _, el in ipairs(inlines) do
-        if el.t ~= "Str" and el.t ~= "Space" and el.t ~= "SoftBreak" then
-            return nil
-        end
-    end
-    -- Concatenate to a flat string
+    -- Single-pass: validate tokens and concatenate simultaneously.
     local combined = ""
     for _, el in ipairs(inlines) do
         if     el.t == "Str"                          then combined = combined .. el.text
         elseif el.t == "Space" or el.t == "SoftBreak" then combined = combined .. " "
+        else   return nil
         end
     end
     -- Find s:{ with brace matching
@@ -84,10 +81,12 @@ local function process_equations(para)
                 id_tag = m
             end
         end
+        if math_el and id_tag then break end
     end
 
     if math_el and id_tag then
         table.insert(ids, id_tag)
+        id_to_num[id_tag] = #ids
         local label_num = #ids
         local code = math_el.text
 
@@ -123,14 +122,16 @@ local function process_equations(para)
     end
 
     -- Phase 2: chemical equation  s:{formula} {#id}
-    local formula, chem_id = detect_chem_equation(para.content)
-    if formula and chem_id then
-        table.insert(ids, chem_id)
+    local formula
+    formula, id_tag = detect_chem_equation(para.content)
+    if formula and id_tag then
+        table.insert(ids, id_tag)
+        id_to_num[id_tag] = #ids
         local label_num = #ids
 
         if FORMAT == "latex" then
             local latex = "\n\\begin{equation}\n\\ce{" .. formula
-                          .. "}\n\\label{" .. chem_id .. "}\n\\end{equation}\n"
+                          .. "}\n\\label{" .. id_tag .. "}\n\\end{equation}\n"
             return pandoc.RawBlock('latex', latex)
 
         elseif FORMAT:match("html") then
@@ -163,20 +164,9 @@ end
 -- Replace citation references (e.g. @eq:myeq) with the equation's
 -- sequence number. Unmatched citations are left unchanged.
 local function process_references(cite)
-
-    -- Look up an identifier in the ids list and return its index.
-    local function get_ids_index(value)
-        for k, v in pairs(ids) do
-            if v == value then
-                return k
-            end
-        end
-        return nil
-    end
-
     if #cite.citations == 1 then
         local id = cite.citations[1].id
-        local index = get_ids_index(id)
+        local index = id_to_num[id]
         if index then
             if FORMAT == "latex" then
                 return pandoc.RawInline('latex', "\\ref{" .. id .. "}")
