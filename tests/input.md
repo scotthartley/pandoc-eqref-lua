@@ -22,15 +22,15 @@ $$x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}$$ {#eq:quadratic}
 
 Combustion of ethanol:
 
-s:{CH3CH2OH + 3O2 -> 2CO2 + 3H2O} {#eq:combustion}
+[CH3CH2OH + 3O2 -> 2CO2 + 3H2O]{.chem} {#eq:combustion}
 
 A simple acid-base reaction:
 
-s:{HCl + NaOH -> NaCl + H2O} {#eq:acidbase}
+[HCl + NaOH -> NaCl + H2O]{.chem} {#eq:acidbase}
 
 Synthesis of ammonia (Haber process):
 
-s:{N2 + 3H2 -> 2NH3} {#eq:haber}
+[N2 + 3H2 -> 2NH3]{.chem} {#eq:haber}
 
 # Cross-references
 
@@ -43,7 +43,7 @@ Mixed reference in one sentence: @eq:energy gives the rest-mass energy, while
 
 # Inline uses (must NOT be numbered)
 
-The reaction s:{H2O} produces water. The formula s:{CO2} is carbon dioxide.
+The reaction [H2O]{.chem} produces water. The formula [CO2]{.chem} is carbon dioxide.
 These inline uses should pass through to pandoc-chem-sub unchanged and must not
 receive equation numbers.
 
@@ -53,4 +53,4 @@ $$a^2 + b^2 = c^2$$
 
 A chemical line with no label is left alone:
 
-s:{Fe + S -> FeS}
+[Fe + S -> FeS]{.chem}
